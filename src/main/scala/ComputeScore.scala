@@ -6,7 +6,7 @@ import org.apache.spark.sql.{Dataset, SaveMode, SparkSession}
 
 case class PlayerSubmission(id: String, cheese: String, quantity: BigInt, month: String)
 
-case class Order(cheese: String, quantity: BigInt, month: String, bill: Double)
+case class Order(cheese: String, quantity: BigInt, month: String, totalPrice: Double)
 
 object ComputeScore {
   val PLAYER_SUBMISSION_FILE: String = sys.env.getOrElse("PLAYER_SUBMISSION_FILE", "src/main/resources/player_submissions.json")
@@ -21,7 +21,7 @@ object ComputeScore {
     val commandDf = spark.read.json(ORDER_FILE).as[Order].toDF()
 
     val res = commandDf.groupBy(col("cheese"), col("month"))
-      .agg(sum(col("quantity")).as("quantity_ordered"), sum(col("bill")).as("bill"))
+      .agg(sum(col("quantity")).as("quantity_ordered"), sum(col("totalPrice")).as("totalPrice"))
       .join(submissionDf, Seq("cheese", "month"))
       .withColumn("score", abs(col("quantity_produced") - col("quantity_ordered")) * (-5))
       .groupBy(col("id"), col("month")).agg(sum("score").as("score"))
