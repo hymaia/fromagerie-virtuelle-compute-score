@@ -6,11 +6,11 @@ import org.apache.spark.sql.{SaveMode, SparkSession}
 import com.amazonaws.services.glue.GlueContext
 import com.amazonaws.services.glue.util.GlueArgParser
 import com.amazonaws.services.glue.util.Job
-import scala.collection.JavaConverters._
-import fr.hymaia.fromagerie.ComputeScore
 import com.amazonaws.services.glue.DynamoDbDataSink
 import com.amazonaws.services.glue.util.JsonOptions
 import com.amazonaws.services.glue.DynamicFrame
+import scala.collection.JavaConverters._
+import fr.hymaia.fromagerie.ComputeScore
 
 object Runner {
   def main(args: Array[String]): Unit = {
