@@ -1,0 +1,94 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  fromagerie-virtuelle-api
+
+  Sample SAM Template for fromagerie-virtuelle-api
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  ComputeScoreJob:
+    Type: AWS::Glue::Job
+    Properties:
+      Role: !Ref MyGlueJobRole
+      Command:
+        Name: glueetl
+        ScriptLocation: !Join
+          - ""
+          - - "s3://"
+            - !ImportValue fromagerie-virtuelle-S3Bucket
+            - "/scripts/Runner.scala"
+      DefaultArguments:
+        "--DYNAMO_TABLE": !ImportValue fromagerie-virtuelle-DynamoDBName
+        "--OUTPUT_FILE": !Join
+          - ""
+          - - "s3://"
+            - !ImportValue fromagerie-virtuelle-S3Bucket
+            - "/data/output"
+        "--COMMAND_FILE": !Join
+          - ""
+          - - "s3://"
+            - !ImportValue fromagerie-virtuelle-S3Bucket
+            - "/data/commands"
+        "--PLAYER_SUBMISSION_FILE": !Join
+          - ""
+          - - "s3://"
+            - !ImportValue fromagerie-virtuelle-S3Bucket
+            - "/data/answers"
+        "--extra-jars": !Join
+          - ""
+          - - "s3://"
+            - !ImportValue fromagerie-virtuelle-S3Bucket
+            - "/jars/compute-score.jar"
+        "--job-language": "scala"
+        "--class": "fr.hymaia.fromagerie.Runner"
+      ExecutionProperty:
+        MaxConcurrentRuns: 10
+      Name: !Sub ${AWS::StackName}-compute-score
+      WorkerType: Standard
+      NumberOfWorkers: 2
+      GlueVersion: 4.0
+
+  MyGlueJobRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - glue.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: MyGlueJobPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:*
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - dynamodb:*
+                Resource:
+                  - !ImportValue fromagerie-virtuelle-DynamoDBArn
+                  - !Join
+                    - "/"
+                    - - !ImportValue fromagerie-virtuelle-DynamoDBArn
+                      - "*"
+              - Effect: Allow
+                Action:
+                  - 'kms:Decrypt'
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - 's3:*'
+                Resource: "*"

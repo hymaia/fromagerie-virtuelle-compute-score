@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "fromagerie-virtuelle-compute-score"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-dlh5angpgti9"
+s3_prefix = "fromagerie-virtuelle-compute-score"
+region = "eu-west-1"
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true

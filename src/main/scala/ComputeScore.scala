@@ -1,20 +1,22 @@
 package fr.hymaia.fromagerie
 
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{Dataset, SaveMode, SparkSession}
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 
 
-case class PlayerSubmission(id: String, cheese: String, quantity: BigInt, month: String)
+case class PlayerSubmission(playerId: String, cheese: String, quantity: BigInt, month: String)
 
 case class Command(cheese: String, quantity: BigInt, month: String, bill: Double)
 
 object ComputeScore {
-  val PLAYER_SUBMISSION_FILE: String = sys.env.getOrElse("PLAYER_SUBMISSION_FILE", "src/main/resources/player_submissions.json")
-  val COMMAND_FILE: String = sys.env.getOrElse("COMMAND_FILE", "src/main/resources/commands.json")
-  val OUTPUT_FILE: String = sys.env.getOrElse("OUTPUT_FILE", "target/resources/output")
 
-  def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder.master("local[*]").appName("CompteScore").getOrCreate()
+  def main(args: Array[String]): DataFrame = {
+    val spark = SparkSession.builder.appName("CompteScore").getOrCreate()
+
+    val PLAYER_SUBMISSION_FILE: String = args(1)
+    val COMMAND_FILE: String = args(2)
+    val OUTPUT_FILE: String = args(3)
+
     import spark.implicits._
 
     val submissionDf = spark.read.json(PLAYER_SUBMISSION_FILE).as[PlayerSubmission].toDF().withColumnRenamed("quantity", "quantity_produced")
@@ -24,8 +26,13 @@ object ComputeScore {
       .agg(sum(col("quantity")).as("quantity_ordered"), sum(col("bill")).as("bill"))
       .join(submissionDf, Seq("cheese", "month"))
       .withColumn("score", abs(col("quantity_produced") - col("quantity_ordered")) * (-5))
-      .groupBy(col("id"), col("month")).agg(sum("score").as("score"))
+      .groupBy(col("playerId"), col("month")).agg(sum("score").as("score"))
 
     res.write.mode(SaveMode.Overwrite).parquet(OUTPUT_FILE)
+
+    res.withColumn("PK", concat(lit("PLAYER#"), col("playerId")))
+      .withColumn("SK", lit("1"))
+      .withColumn("GSI1PK", lit("TOP"))
+      .withColumn("GSI1SK", concat(lit("SCORE#"), col("score")))
   }
 }
