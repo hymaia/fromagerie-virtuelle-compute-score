@@ -50,8 +50,8 @@ Resources:
         MaxConcurrentRuns: 10
       Name: !Sub ${AWS::StackName}-compute-score
       WorkerType: Standard
-      NumberOfWorkers: 2
-      GlueVersion: 4.0
+      NumberOfWorkers: 10
+      GlueVersion: "4.0"
 
   MyGlueJobRole:
     Type: AWS::IAM::Role

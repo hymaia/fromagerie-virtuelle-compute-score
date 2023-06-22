@@ -1,12 +1,5 @@
-{"cheese": "comté", "quantity": 10, "month": "2022-11", "bill": 50.0}
-{"cheese": "comté", "quantity": 10, "month": "2022-11", "bill": 50.0}
-{"cheese": "comté", "quantity": 10, "month": "2022-11", "bill": 50.0}
-{"cheese": "comté", "quantity": 10, "month": "2022-11", "bill": 50.0}
-{"cheese": "comté", "quantity": 10, "month": "2022-11", "bill": 50.0}
-{"cheese": "comté", "quantity": 10, "month": "2022-11", "bill": 50.0}
-{"cheese": "comté", "quantity": 10, "month": "2022-11", "bill": 50.0}
-{"cheese": "roquefort", "quantity": 10, "month": "2022-11", "bill": 90.0}
-{"cheese": "roquefort", "quantity": 10, "month": "2022-11", "bill": 90.0}
-{"cheese": "roquefort", "quantity": 10, "month": "2022-11", "bill": 90.0}
-{"cheese": "roquefort", "quantity": 10, "month": "2022-11", "bill": 90.0}
-{"cheese": "roquefort", "quantity": 10, "month": "2022-11", "bill": 90.0}
+{"year": 2024, "month":  1, "day":  1, "bill":35.0,"cheese":"fourme de Montbrison","quantity":5}
+{"year": 2024, "month":  1, "day":  1, "bill":10.0,"cheese":"roquefort","quantity":1}
+{"year": 2024, "month":  1, "day":  1, "bill":16.0,"cheese":"emmental","quantity":4}
+{"year": 2024, "month":  1, "day":  1, "bill":27.0,"cheese":"parmesan","quantity":3}
+{"year": 2024, "month":  1, "day":  1, "bill":10.0,"cheese":"mimolette","quantity":2}
