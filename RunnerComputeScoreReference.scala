@@ -10,7 +10,7 @@ import com.amazonaws.services.glue.util.JsonOptions
 import scala.collection.JavaConverters._
 import fr.hymaia.fromagerie.ComputeScore
 
-object Runner {
+object RunnerComputeScoreReference {
   def main(args: Array[String]): Unit = {
     val sc: SparkContext = new SparkContext()
     val glueContext: GlueContext = new GlueContext(sc)
@@ -23,7 +23,7 @@ object Runner {
     val params = GlueArgParser.getResolvedOptions(args, param_names)
     Job.init(params("JOB_NAME"), glueContext, params.asJava)
 
-    ComputeScore.ComputeScoreReference(param_names.map(params(_)))
+    ComputeScore.computeScoreReference(param_names.map(params(_)))
 
     Job.commit()
   }

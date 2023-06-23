@@ -25,7 +25,8 @@ jobs:
       - name: upload jar
         run: aws s3 cp target/scala-2.12/fromagerie-virtuelle-compute-score_2.12-0.1.jar s3://fromagerie-virtuelle-datalake/jars/compute-score.jar
       - name: upload glue job script
-        run: aws s3 cp Runner.scala s3://fromagerie-virtuelle-datalake/scripts/Runner.scala
+        run: aws s3 cp RunnerComputeScoreReference.scala s3://fromagerie-virtuelle-datalake/scripts/RunnerComputeScoreReference.scala
+      - run: aws s3 cp RunnerComputeScore.scala s3://fromagerie-virtuelle-datalake/scripts/RunnerComputeScore.scala
       - uses: aws-actions/setup-sam@v1
       - run: sam build --use-container
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset

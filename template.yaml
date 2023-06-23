@@ -11,6 +11,42 @@ Globals:
     Timeout: 3
 
 Resources:
+  ComputeScoreReferenceJob:
+    Type: AWS::Glue::Job
+    Properties:
+      Role: !Ref MyGlueJobRole
+      Command:
+        Name: glueetl
+        ScriptLocation: !Join
+          - ""
+          - - "s3://"
+            - !ImportValue fromagerie-virtuelle-S3Bucket
+            - "/scripts/RunnerComputeScoreReference.scala"
+      DefaultArguments:
+        "--OUTPUT_FILE": !Join
+          - ""
+          - - "s3://"
+            - !ImportValue fromagerie-virtuelle-S3Bucket
+            - "/data/score-reference"
+        "--COMMAND_FILE": !Join
+          - ""
+          - - "s3://"
+            - !ImportValue fromagerie-virtuelle-S3Bucket
+            - "/data/commands"
+        "--extra-jars": !Join
+          - ""
+          - - "s3://"
+            - !ImportValue fromagerie-virtuelle-S3Bucket
+            - "/jars/compute-score.jar"
+        "--job-language": "scala"
+        "--class": "fr.hymaia.fromagerie.RunnerComputeScoreReference"
+      ExecutionProperty:
+        MaxConcurrentRuns: 10
+      Name: !Sub ${AWS::StackName}-compute-score-reference
+      WorkerType: Standard
+      NumberOfWorkers: 8
+      GlueVersion: "4.0"
+
   ComputeScoreJob:
     Type: AWS::Glue::Job
     Properties:
@@ -21,20 +57,20 @@ Resources:
           - ""
           - - "s3://"
             - !ImportValue fromagerie-virtuelle-S3Bucket
-            - "/scripts/Runner.scala"
+            - "/scripts/RunnerComputeScore.scala"
       DefaultArguments:
         "--DYNAMO_TABLE": !ImportValue fromagerie-virtuelle-DynamoDBName
         "--OUTPUT_FILE": !Join
           - ""
           - - "s3://"
             - !ImportValue fromagerie-virtuelle-S3Bucket
-            - "/data/output"
-        "--COMMAND_FILE": !Join
+            - "/data/scores"
+        "--SCORE_REFERENCE_FILE": !Join
           - ""
           - - "s3://"
             - !ImportValue fromagerie-virtuelle-S3Bucket
-            - "/data/commands"
-        "--PLAYER_SUBMISSION_FILE": !Join
+            - "/data/score-reference"
+        "--ANSWER_FILE": !Join
           - ""
           - - "s3://"
             - !ImportValue fromagerie-virtuelle-S3Bucket
@@ -45,12 +81,12 @@ Resources:
             - !ImportValue fromagerie-virtuelle-S3Bucket
             - "/jars/compute-score.jar"
         "--job-language": "scala"
-        "--class": "fr.hymaia.fromagerie.Runner"
+        "--class": "fr.hymaia.fromagerie.RunnerComputeScore"
       ExecutionProperty:
         MaxConcurrentRuns: 10
       Name: !Sub ${AWS::StackName}-compute-score
       WorkerType: Standard
-      NumberOfWorkers: 10
+      NumberOfWorkers: 2
       GlueVersion: "4.0"
 
   MyGlueJobRole:
